@@ -6,15 +6,22 @@ import numpy as np
 # RESULTS = "/users/roncoleman/tmp/style/results.txt"
 DIR = "/users/roncoleman/GD/marist/research/better-style/results/"
 
-# RESULTS = "linux-kernel-styles-cos-gindent-nograte.txt"
-# RESULTS = "linux-kernel-styles-cos-gindent.txt"
-# RESULTS = "linux-lib-styles-cos-gindent.txt"
-# RESULTS = "coreutils-styles-cos-gindent.txt"
-# RESULTS = "gmp-styles-cos-gindent.txt"
-#RESULTS = "gimp-styles-cos-gindent.txt"
-# RESULTS = "mysql-styles-cos-gindent.txt"
-RESULTS = "allegro5-styles-cos-gindent.txt"
+# Pairs
+# RESULTS="allegro5-kr-orig-jac-gindent-10.txt" # ** statistically significant
+# RESULTS="allegro5-kr-linux-jac-gindent-10.txt"
+# RESULTS="allegro5-kr-gnu-jac-gindent-10.txt"
+# RESULTS="allegro5-orig-gnu-jac-gindent-10.txt"
+# RESULTS="allegro5-linux-gnu-jac-gindent-10.txt"
+RESULTS="allegro5-linux-orig-jac-gindent-10.txt"
 
+# Triples
+RESULTS="allegro5-kr-orig-linux-jac-gindent-10.txt"  # KBL
+RESULTS="allegro5-kr-orig-gnu-jac-gindent-10.txt"    # KBG
+RESULTS="allegro5-kr-linux-gnu-jac-gindent-10.txt"   # KLG
+RESULTS="allegro5-orig-linux-gnu-jac-gindent-10.txt" # BLG
+
+# Quadruple
+RESULTS="allegro5-kr-orig-linux-gnu-jac-gindent-10.txt" # KBLG
 
 df = pd.read_csv(DIR+RESULTS, delimiter=r"\s+")
 
@@ -26,10 +33,10 @@ STYLES = ['kr', 'linux', 'orig', 'gnu']
 
 df_t = pd.DataFrame()
 
-for style in STYLES:
-    key = style + ':cos'
-    key_t = style + "_cos"
-    df_t[key_t] = df[key] #.apply(lambda p: round(p,2))
+# for style in STYLES:
+#     key = style + ':cos'
+#     key_t = style + "_cos"
+#     df_t[key_t] = df[key] #.apply(lambda p: round(p,2))
 
 # gains = df_t[df_t.orig_cos >= df_t.gnu_cos  ]
 #
@@ -76,7 +83,54 @@ for style in STYLES:
 print(RESULTS+": "+str(df.shape))
 
 # https://astatsa.com/OneWay_Anova_with_TukeyHSD/
-print("H test: "+str(stats.kruskal(df_t['kr_cos'], df_t['linux_cos'], df_t['orig_cos'], df_t['gnu_cos'])))
+# print("H test cos: "+str(stats.kruskal(df_t['kr_cos'], df_t['linux_cos'], df_t['orig_cos'], df_t['gnu_cos'])))
+#
+# seen = []
+# for style1 in STYLES:
+#     for style2 in STYLES:
+#         if style1 == style2:
+#             continue
+#         seeing_a = style1 + style2
+#         seeing_b = style2 + style1
+#         if seeing_a in seen or seeing_b in seen:
+#             continue
+#         seen.append(seeing_a)
+#         print(style1 + " vs "+style2 +": "+str(stats.wilcoxon(df_t[style1+"_cos"], df_t[style2+"_cos"])))
+
+
+# for style in STYLES:
+#     print(style+" cos median: " + str(np.median(df_t[style + '_cos'])))
+# print()
+
+df_t = pd.DataFrame()
+
+for style in STYLES:
+    key = style + ':d'
+    key_t = style + "_d"
+    df_t[key_t] = df[key] / df["base:loc"]
+
+print("H test d: "+str(stats.kruskal(df['kr:d'], df['linux:d'], df['orig:d'], df['gnu:d'])))
+
+
+# for style in STYLES:
+#     # print("median "+style+": "+str(np.median(df_t[style+'_cos'])))
+#     print(style+" d percentiles: "+str(np.percentile(df_t[style+"_d"],[25, 50, 75, 95])))
+seen = []
+for style1 in STYLES:
+    for style2 in STYLES:
+        if style1 == style2:
+            continue
+        seeing_a = style1 + style2
+        seeing_b = style2 + style1
+        if seeing_a in seen or seeing_b in seen:
+            continue
+        seen.append(seeing_a)
+        print(style1 + " vs "+style2 +" d: "+str(stats.wilcoxon(df[style1+":d"], df[style2+":d"])))
+for style in STYLES:
+    print(style + " d median: " + str(np.median(df[style + ':d'])))
+print()
+
+print("H test _d: "+str(stats.kruskal(df_t['kr_d'], df_t['linux_d'], df_t['orig_d'], df_t['gnu_d'])))
 
 seen = []
 for style1 in STYLES:
@@ -88,8 +142,10 @@ for style1 in STYLES:
         if seeing_a in seen or seeing_b in seen:
             continue
         seen.append(seeing_a)
-        print(style1 + " vs "+style2 +": "+str(stats.wilcoxon(df_t[style1+"_cos"], df_t[style2+"_cos"])))
+        print(style1 + " vs "+style2 +" _d: "+str(stats.wilcoxon(df_t[style1+"_d"], df_t[style2+"_d"])))
 
 for style in STYLES:
-    # print("median "+style+": "+str(np.median(df_t[style+'_cos'])))
-    print(style+" percentiles: "+str(np.percentile(df_t[style+"_cos"],[25, 50, 75, 95])))
+    print(style + " _d median: " + str(np.median(df_t[style + '_d'])))
+
+# for style in STYLES:
+#     print(style + " _d normal: " + str(stats.normaltest(df_t[style+"_d"])))
