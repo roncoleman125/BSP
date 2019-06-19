@@ -6,27 +6,33 @@ import numpy as np
 # RESULTS = "/users/roncoleman/tmp/style/results.txt"
 DIR = "/users/roncoleman/GD/marist/research/better-style/results/"
 
-# Pairs
-# RESULTS="allegro5-kr-orig-jac-gindent-10.txt" # ** statistically significant
-# RESULTS="allegro5-kr-linux-jac-gindent-10.txt"
-# RESULTS="allegro5-kr-gnu-jac-gindent-10.txt"
-# RESULTS="allegro5-orig-gnu-jac-gindent-10.txt"
-# RESULTS="allegro5-linux-gnu-jac-gindent-10.txt"
-RESULTS="allegro5-linux-orig-jac-gindent-10.txt"
+# Singles
+RESULTS="allegro5-kr-jac-gindent-10.txt"
+RESULTS="allegro5-orig-jac-gindent-10.txt"
+RESULTS="allegro5-linux-jac-gindent-10.txt"
+RESULTS="allegro5-gnu-jac-gindent-10.txt"
+#
+# # Pairs
+RESULTS="allegro5-kr-orig-jac-gindent-10.txt"    # KB
+RESULTS="allegro5-kr-linux-jac-gindent-10.txt"   # KL
+# RESULTS="allegro5-kr-gnu-jac-gindent-10.txt"     # KG
+# RESULTS="allegro5-linux-orig-jac-gindent-10.txt" # BL
+# RESULTS="allegro5-orig-gnu-jac-gindent-10.txt"   # BG
+# RESULTS="allegro5-linux-gnu-jac-gindent-10.txt"  # LG
 
 # Triples
-RESULTS="allegro5-kr-orig-linux-jac-gindent-10.txt"  # KBL
-RESULTS="allegro5-kr-orig-gnu-jac-gindent-10.txt"    # KBG
-RESULTS="allegro5-kr-linux-gnu-jac-gindent-10.txt"   # KLG
-RESULTS="allegro5-orig-linux-gnu-jac-gindent-10.txt" # BLG
+# RESULTS="allegro5-kr-orig-linux-jac-gindent-10.txt"  # KBL
+# RESULTS="allegro5-kr-orig-gnu-jac-gindent-10.txt"    # KBG
+# RESULTS="allegro5-kr-linux-gnu-jac-gindent-10.txt"   # KLG
+# RESULTS="allegro5-orig-linux-gnu-jac-gindent-10.txt" # BLG
 
 # Quadruple
-RESULTS="allegro5-kr-orig-linux-gnu-jac-gindent-10.txt" # KBLG
+# RESULTS="allegro5-kr-orig-linux-gnu-jac-gindent-10.txt" # KBLG
 
 df = pd.read_csv(DIR+RESULTS, delimiter=r"\s+")
 
 # Round to three places
-STYLES = ['kr', 'linux', 'orig', 'gnu']
+STYLES = ['kr', 'orig', 'linux', 'gnu']
 
 # print(df['orig:cos'].median())
 # print(df['gnu:cos'].median())
@@ -130,22 +136,22 @@ for style in STYLES:
     print(style + " d median: " + str(np.median(df[style + ':d'])))
 print()
 
-print("H test _d: "+str(stats.kruskal(df_t['kr_d'], df_t['linux_d'], df_t['orig_d'], df_t['gnu_d'])))
-
-seen = []
-for style1 in STYLES:
-    for style2 in STYLES:
-        if style1 == style2:
-            continue
-        seeing_a = style1 + style2
-        seeing_b = style2 + style1
-        if seeing_a in seen or seeing_b in seen:
-            continue
-        seen.append(seeing_a)
-        print(style1 + " vs "+style2 +" _d: "+str(stats.wilcoxon(df_t[style1+"_d"], df_t[style2+"_d"])))
-
-for style in STYLES:
-    print(style + " _d median: " + str(np.median(df_t[style + '_d'])))
+# print("H test _d: "+str(stats.kruskal(df_t['kr_d'], df_t['linux_d'], df_t['orig_d'], df_t['gnu_d'])))
+#
+# seen = []
+# for style1 in STYLES:
+#     for style2 in STYLES:
+#         if style1 == style2:
+#             continue
+#         seeing_a = style1 + style2
+#         seeing_b = style2 + style1
+#         if seeing_a in seen or seeing_b in seen:
+#             continue
+#         seen.append(seeing_a)
+#         print(style1 + " vs "+style2 +" _d: "+str(stats.wilcoxon(df_t[style1+"_d"], df_t[style2+"_d"])))
+#
+# for style in STYLES:
+#     print(style + " _d median: " + str(np.median(df_t[style + '_d'])))
 
 # for style in STYLES:
 #     print(style + " _d normal: " + str(stats.normaltest(df_t[style+"_d"])))
